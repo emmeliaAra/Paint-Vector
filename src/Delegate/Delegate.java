@@ -1,19 +1,14 @@
 package Delegate;
 
 import Model.IModel;
-import Shapes.CustomRectangle;
+import Model.Model;
 import Shapes.CustomShape;
-import com.sun.org.apache.regexp.internal.RE;
-import javafx.scene.effect.InnerShadow;
-
+import FileManager.FileManager;
 import javax.swing.*;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.Border;
-import javax.swing.border.LineBorder;
-import javax.swing.plaf.basic.BasicBorders;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
+import java.io.IOException;
 import java.util.LinkedList;
 
 public class Delegate extends JFrame implements IDelegate{
@@ -28,9 +23,6 @@ public class Delegate extends JFrame implements IDelegate{
     private static final String TRIANGLE = "Triangle";
     private IModel model;
     private JPanel mainPanel;
-    private JMenuBar menuBar;
-    private JMenu file, edit;
-    private JMenuItem load, save, saveAS, undo, redo;
     private LinkedList<JButton> toolButtons;
     private LinkedList<CustomShape> shapes ;
     private Color color;
@@ -52,11 +44,9 @@ public class Delegate extends JFrame implements IDelegate{
         mainPanel.setLayout(new BorderLayout());
         drawingPanel = new DrawingPanel(model);
         createButtons();
-        createMenuBar();
         addActionsToButtons();
 
         JToolBar toolBar = new JToolBar();
-        toolBar.add(menuBar);
         toolBar = addButtons(toolBar);
 
         mainPanel.add(toolBar, BorderLayout.NORTH);
@@ -67,27 +57,6 @@ public class Delegate extends JFrame implements IDelegate{
         this.add(mainPanel);
         this.setVisible(true);
         this.setResizable(false);
-    }
-
-    public void createMenuBar() {
-        menuBar = new JMenuBar();
-        file = new JMenu("File");
-        edit = new JMenu("Edit");
-
-        menuBar.add(file);
-        menuBar.add(edit);
-
-        save = new JMenuItem("Save");
-        saveAS = new JMenuItem("SaveAs");
-        load = new JMenuItem("Load");
-        file.add(save);
-        file.add(saveAS);
-        file.add(load);
-
-        undo = new JMenuItem("Undo");
-        redo = new JMenuItem("redo");
-        edit.add(undo);
-        edit.add(redo);
     }
 
     public void createButtons() {
@@ -101,6 +70,8 @@ public class Delegate extends JFrame implements IDelegate{
         Icon selectAndMoveIcon = new ImageIcon("Icons\\selectAndMoveIcon.png");
         Icon undoIcon = new ImageIcon("Icons\\undo.png");
         Icon redoIcon = new ImageIcon("Icons\\redo.png");
+        Icon saveIcon = new ImageIcon("Icons\\saveIcon.png");
+        Icon loadIcon = new ImageIcon("Icons\\loadIcon.png");
 
         toolButtons = new LinkedList<>();
 
@@ -114,6 +85,8 @@ public class Delegate extends JFrame implements IDelegate{
         JButton selectAndMoveButton = new JButton(selectAndMoveIcon);
         JButton undoButton = new JButton(undoIcon);
         JButton redoButton = new JButton(redoIcon);
+        JButton saveButton = new JButton(saveIcon);
+        JButton loadButton = new JButton(loadIcon);
 
         lineButton.setToolTipText("Line");
         rectangleButton.setToolTipText("Rectangle");
@@ -124,6 +97,8 @@ public class Delegate extends JFrame implements IDelegate{
         selectAndMoveButton.setToolTipText("Select and move Shapes");
         undoButton.setToolTipText("Undo");
         redoButton.setToolTipText("Redo");
+        saveButton.setToolTipText("Save Canvas");
+        saveButton.setToolTipText("Load Canvas");
 
         toolButtons.add(lineButton);
         toolButtons.add(rectangleButton);
@@ -135,6 +110,8 @@ public class Delegate extends JFrame implements IDelegate{
         toolButtons.add(selectAndMoveButton);
         toolButtons.add(undoButton);
         toolButtons.add(redoButton);
+        toolButtons.add(saveButton);
+        toolButtons.add(loadButton);
     }
 
     public JToolBar addButtons(JToolBar toolBar){
@@ -228,6 +205,22 @@ public class Delegate extends JFrame implements IDelegate{
                 model.redo();
             }
         });
+
+        toolButtons.get(10).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                model.setSelectMode(false);
+                model.saveCanvas();
+            }
+        });
+
+        toolButtons.get(11).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                model.setSelectMode(false);
+                model.loadCanvas();
+            }
+        });
     }
 
     public void redrawAfterUndoRedo(LinkedList<CustomShape> shapes){
@@ -257,15 +250,30 @@ public class Delegate extends JFrame implements IDelegate{
                         redrawAfterUndoRedo((LinkedList<CustomShape>) event.getNewValue());
                     }
                 });
-
-            }/* else if(event.getPropertyName().equalsIgnoreCase("FillingValueChange")){
+            }else if(event.getPropertyName().equalsIgnoreCase("SaveCanvas")){
                 SwingUtilities.invokeLater(new Runnable(){
                     public void run(){
-                        bucketButtonFocus((boolean)event.getNewValue());
+                        try {
+                            FileManager.saveCanvas((IModel)event.getNewValue());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
-
-            }*/
+            }else if(event.getPropertyName().equalsIgnoreCase("LoadCanvas")){
+                SwingUtilities.invokeLater(new Runnable(){
+                    public void run(){
+                        try {
+                            model = FileManager.loadCanvas((IModel)event.getNewValue());
+                            drawingPanel.setModel(model);
+                            drawingPanel.setShapes(model.getStoredShapes());
+                            drawingPanel.repaint();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
         }
     }
 }

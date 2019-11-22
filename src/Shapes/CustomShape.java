@@ -2,8 +2,9 @@ package Shapes;
 
 import java.awt.*;
 import java.awt.geom.Area;
+import java.io.Serializable;
 
-public abstract class CustomShape{
+public abstract class CustomShape implements Serializable {
 
     private Color shapeColor;
     private String shapeID;

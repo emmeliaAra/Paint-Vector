@@ -1,8 +1,9 @@
 package Shapes;
 
 import java.awt.*;
+import java.io.Serializable;
 
-public class CustomSquare extends CustomQuadrilateral {
+public class CustomSquare extends CustomQuadrilateral implements Serializable {
 
     public CustomSquare(String shapeId, Color shapeColor, Point startPoint, Point endPoint, boolean isFilled) {
         super(shapeId, shapeColor, startPoint, endPoint, isFilled);

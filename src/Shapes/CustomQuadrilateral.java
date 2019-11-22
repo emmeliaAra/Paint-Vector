@@ -3,8 +3,9 @@ package Shapes;
 
 import java.awt.*;
 import java.awt.geom.Area;
+import java.io.Serializable;
 
-public abstract class CustomQuadrilateral extends CustomShape {
+public abstract class CustomQuadrilateral extends CustomShape implements Serializable {
 
     private int width, height;
     private Point startPoint, endPoint,point1,point2;
@@ -64,11 +65,13 @@ public abstract class CustomQuadrilateral extends CustomShape {
         } else {
             endPointY = this.getStartPoint().y +newPoint.y;
         }
-        
+
         this.setStartPoint(new Point(startPointX,startPointY));
         this.setEndPoint(new Point(endPointX,endPointY));
         this.findRectangleBoundaries();
     }
+
+
 
     public void setEndPoint(Point point){
         point2 = point;

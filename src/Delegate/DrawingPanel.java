@@ -9,20 +9,19 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.beans.PropertyChangeEvent;
+import java.io.Serializable;
 import java.util.LinkedList;
 
 
-public class DrawingPanel extends JPanel implements MouseListener,MouseMotionListener,IDelegate {
+public class DrawingPanel extends JPanel implements MouseListener,MouseMotionListener, Serializable {
 
     private IModel model;
-    private Point startPoint,endPoint;
     private LinkedList<CustomShape> shapes,storedShapes;
     private static final String LINE = "Line";
     private static final String RECTANGLE = "Rectangle";
     private static final String SQUARE = "Square";
     private static final String ELLIPSE = "Ellipse";
     private static final String TRIANGLE = "Triangle";
-    private boolean hasFilling;
 
     private CustomLine line;
     private CustomRectangle rectangle;
@@ -31,8 +30,6 @@ public class DrawingPanel extends JPanel implements MouseListener,MouseMotionLis
     private CustomTriangle triangle;
     private CustomShape currentSelectedShape;
 
-
-
     public DrawingPanel(IModel model){
         addMouseListener(this);
         addMouseMotionListener(this);
@@ -40,12 +37,8 @@ public class DrawingPanel extends JPanel implements MouseListener,MouseMotionLis
         this.setBorder(BorderFactory.createLineBorder(Color.GRAY,5));
         this.setBackground(Color.WHITE);
         this.model = model;
-        this.model.addObservers(this);
-        startPoint = new Point();
-        endPoint = new Point();
         shapes = new LinkedList<>();
         storedShapes = new LinkedList<>();
-        hasFilling = false;
     }
 
     public void paintComponent(Graphics g) {
@@ -82,10 +75,8 @@ public class DrawingPanel extends JPanel implements MouseListener,MouseMotionLis
                         g.drawLine(((CustomLine)shape).getStartPoint().x,((CustomLine)shape).getStartPoint().y,((CustomLine)shape).getEndPoint().x,((CustomLine)shape).getEndPoint().y );
                         break;
                     case RECTANGLE:
-                        g.drawRect(((CustomRectangle)shape).getStartPoint().x,((CustomRectangle)shape).getStartPoint().y,((CustomRectangle)shape).getWidth(),((CustomRectangle)shape).getHeight());
-                        break;
                     case SQUARE:
-                        g.drawRect(((CustomSquare)shape).getStartPoint().x,((CustomSquare)shape).getStartPoint().y,((CustomSquare)shape).getWidth(),((CustomSquare)shape).getHeight());
+                        g.drawRect(((CustomQuadrilateral)shape).getStartPoint().x,((CustomQuadrilateral)shape).getStartPoint().y,((CustomQuadrilateral)shape).getWidth(),((CustomQuadrilateral)shape).getHeight());
                         break;
                     case ELLIPSE:
                         g.drawOval(((CustomEllipse)shape).getStartPoint().x,((CustomEllipse)shape).getStartPoint().y,((CustomEllipse)shape).getWidth(),((CustomEllipse)shape).getHeight());
@@ -109,8 +100,17 @@ public class DrawingPanel extends JPanel implements MouseListener,MouseMotionLis
                 switch (shape.getShapeID()){
                     case RECTANGLE:
                     case SQUARE:
-                        currentSelectedShape=((CustomQuadrilateral)shape).getShapeInArea(e.getPoint());
+                        currentSelectedShape =((CustomQuadrilateral)shape).getShapeInArea(e.getPoint());
                             break;
+                    case LINE:
+                        currentSelectedShape = ((CustomLine)shape).getShapeInArea(e.getPoint());
+                        break;
+                    case TRIANGLE:
+                        currentSelectedShape = ((CustomTriangle)shape).getShapeInArea(e.getPoint());
+                        break;
+                    case ELLIPSE:
+                        currentSelectedShape = (((CustomEllipse)shape).getShapeInArea(e.getPoint()));
+                        break;
                 }
                 if(currentSelectedShape != null)
                     break;
@@ -122,19 +122,19 @@ public class DrawingPanel extends JPanel implements MouseListener,MouseMotionLis
     public void mousePressed(MouseEvent e) {
         switch(model.getCurrentShapeSelected()){
             case LINE:
-                line = new CustomLine(LINE,model.getColor(),e.getPoint(),new Point(),hasFilling);
+                line = new CustomLine(LINE,model.getColor(),e.getPoint(),new Point(),hasFocus());
                 break;
             case RECTANGLE:
-                rectangle = new CustomRectangle(RECTANGLE,model.getColor(),e.getPoint(),new Point(),hasFilling);
+                rectangle = new CustomRectangle(RECTANGLE,model.getColor(),e.getPoint(),new Point(),model.getHasFilling());
                 break;
             case SQUARE:
-                square = new CustomSquare(SQUARE,model.getColor(),e.getPoint(),new Point(),hasFilling);
+                square = new CustomSquare(SQUARE,model.getColor(),e.getPoint(),new Point(),model.getHasFilling());
                 break;
             case ELLIPSE:
-                ellipse = new CustomEllipse(ELLIPSE,model.getColor(),e.getPoint(),new Point(),hasFilling);
+                ellipse = new CustomEllipse(ELLIPSE,model.getColor(),e.getPoint(),new Point(),model.getHasFilling());
                 break;
             case TRIANGLE:
-                triangle = new CustomTriangle(TRIANGLE,model.getColor(),e.getPoint(),3,hasFilling);
+                triangle = new CustomTriangle(TRIANGLE,model.getColor(),e.getPoint(),3,model.getHasFilling());
                 break;
         }
     }
@@ -221,6 +221,12 @@ public class DrawingPanel extends JPanel implements MouseListener,MouseMotionLis
                     case SQUARE:
                         ((CustomQuadrilateral) currentSelectedShape).moveShape(e.getPoint());
                         break;
+                    case LINE:
+                        ((CustomLine)currentSelectedShape).moveShape(e.getPoint());
+                        break;
+                    case ELLIPSE:
+                        ((CustomEllipse)currentSelectedShape).moveShape(e.getPoint());
+
                 }
                 repaint();
             }
@@ -232,25 +238,17 @@ public class DrawingPanel extends JPanel implements MouseListener,MouseMotionLis
 
     }
 
+    public LinkedList<CustomShape> getShapes(){
+        return shapes;
+    }
 
     public void setShapes(LinkedList<CustomShape> shapes){
         this.shapes = (LinkedList<CustomShape>)shapes.clone();
         this.storedShapes =  (LinkedList<CustomShape>)shapes.clone();
     }
 
-    @Override
-    public void propertyChange(PropertyChangeEvent event) {
-        if(event.getSource().equals(model)){
-            if(event.getPropertyName().equalsIgnoreCase("FillingValueChange")){
-                SwingUtilities.invokeLater(new Runnable(){
-                    public void run(){
-                        hasFilling = (boolean)event.getNewValue();
-                    }
-                });
-
-            }
-
-        }
+    public void setModel(IModel model){
+        this.model = model;
     }
 
 }

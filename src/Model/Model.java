@@ -5,10 +5,11 @@ import Shapes.*;
 import java.awt.*;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.Stack;
 
-public class Model implements IModel {
+public class Model implements IModel, Serializable {
 
     private PropertyChangeSupport notifier;
     private static final String LINE = "Line";
@@ -53,6 +54,7 @@ public class Model implements IModel {
         LinkedList<CustomShape> tempShapeList = (LinkedList<CustomShape>)shapes.clone();
         CustomShape customShape = new CustomRectangle(currentShapeSelected,color,startPoint,endPoint,hasFilling);
         ((CustomRectangle)customShape).findRectangleBoundaries();
+        ((CustomRectangle)customShape).calculateShapeVariables();
         shapes.add(customShape);
         notifier.firePropertyChange("CreateShape",tempShapeList,shapes);
     }
@@ -62,6 +64,7 @@ public class Model implements IModel {
         LinkedList<CustomShape> tempShapeList = (LinkedList<CustomShape>)shapes.clone();
         CustomShape customShape = new CustomSquare(currentShapeSelected,color,startPoint,endPoint,hasFilling);
         ((CustomSquare)customShape).findRectangleBoundaries();
+        ((CustomSquare)customShape).calculateShapeVariables();
         ((CustomSquare)customShape).setHeight(((CustomSquare) customShape).getWidth());
         shapes.add(customShape);
         notifier.firePropertyChange("CreateShape",tempShapeList,shapes);
@@ -91,10 +94,7 @@ public class Model implements IModel {
 
     @Override
     public void enableFilling() {
-        boolean previousFillingState = hasFilling;
         hasFilling = !hasFilling;
-        System.out.println(previousFillingState + " "+ hasFilling);
-        notifier.firePropertyChange("FillingValueChange",previousFillingState,hasFilling);
     }
 
     @Override
@@ -116,7 +116,6 @@ public class Model implements IModel {
             shapes.addLast(customShape);
             notifier.firePropertyChange("RedoMode",tempShapeList,shapes);
         }
-
     }
 
     @Override
@@ -134,7 +133,27 @@ public class Model implements IModel {
     }
 
     @Override
-    public Color getColor(){
+    public void saveCanvas() {
+        notifier.firePropertyChange("SaveCanvas",null,this);
+    }
+
+    @Override
+    public void loadCanvas() {
+        notifier.firePropertyChange("LoadCanvas",null,this);
+    }
+
+    @Override
+    public boolean getHasFilling() {
+        return hasFilling;
+    }
+
+    @Override
+    public Color getColor() {
         return color;
+    }
+
+    @Override
+    public LinkedList<CustomShape> getStoredShapes() {
+        return shapes;
     }
 }

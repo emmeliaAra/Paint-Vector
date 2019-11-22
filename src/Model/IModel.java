@@ -2,9 +2,11 @@ package Model;
 
 
 import Shapes.CustomLine;
+import Shapes.CustomShape;
 
 import java.awt.*;
 import java.beans.PropertyChangeListener;
+import java.util.LinkedList;
 
 public interface IModel {
 
@@ -22,5 +24,9 @@ public interface IModel {
     void setSelectMode(boolean isSelected);
     String getCurrentShapeSelected();
     boolean getSelectMode();
+    void saveCanvas();
+    void loadCanvas();
+    boolean getHasFilling();
     Color getColor();
+    LinkedList<CustomShape> getStoredShapes();
 }

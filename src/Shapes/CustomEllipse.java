@@ -1,8 +1,9 @@
 package Shapes;
 
 import java.awt.*;
+import java.io.Serializable;
 
-public class CustomEllipse extends CustomShape {
+public class CustomEllipse extends CustomShape implements Serializable {
 
     private Point startPoint, endPoint,point1,point2;
     private int height,width;
@@ -69,11 +70,14 @@ public class CustomEllipse extends CustomShape {
 
     @Override
     public void moveShape(Point newPoint) {
-
+        startPoint = newPoint;
     }
 
     @Override
     public CustomShape getShapeInArea(Point point) {
+        if(startPoint.x <= point.x && point.x <= (startPoint.x + width) && startPoint.y <= point.y && point.y <= (startPoint.y +height)){
+            return this;
+        }
         return null;
     }
 }

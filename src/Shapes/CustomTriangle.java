@@ -1,8 +1,10 @@
 package Shapes;
 
 import java.awt.*;
+import java.awt.geom.Area;
+import java.io.Serializable;
 
-public class CustomTriangle extends CustomShape {
+public class CustomTriangle extends CustomShape implements Serializable {
 
     private Point[] points;
     private Point initialPoint;
@@ -32,6 +34,12 @@ public class CustomTriangle extends CustomShape {
 
     @Override
     public CustomShape getShapeInArea(Point point) {
+        int[] xPoints = {points[0].x, points[1].x,points[2].x};
+        int[] yPoints = {points[0].y, points[1].y,points[2].y};
+        Area area = new Area(new Polygon(xPoints,yPoints,3));
+        if(area.contains(point)){
+            return this;
+        }
         return null;
     }
 }
