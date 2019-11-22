@@ -1,14 +1,10 @@
 package Model;
 
-import Shapes.CustomEllipse;
-import Shapes.CustomLine;
-import Shapes.CustomRectangle;
-import Shapes.CustomShape;
+import Shapes.*;
 
 import java.awt.*;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.beans.XMLDecoder;
 import java.util.LinkedList;
 import java.util.Stack;
 
@@ -21,15 +17,14 @@ public class Model implements IModel {
     private String currentShapeSelected = LINE;
     private LinkedList<CustomShape> shapes;
     private Color color;
-    private boolean undoMode,redoMode;
+    private boolean hasFilling;
     private Stack<CustomShape> undoShapeStack;
 
     public Model(){
         notifier = new PropertyChangeSupport(this);
         shapes = new LinkedList<>();
         color = Color.BLACK;
-        undoMode = false;
-        redoMode = false;
+        hasFilling = false;
         undoShapeStack = new Stack<>();
     }
 
@@ -48,7 +43,7 @@ public class Model implements IModel {
     @Override
     public void createLine(Point startPoint,Point endPoint) {
         LinkedList<CustomShape> tempShapeList = (LinkedList<CustomShape>)shapes.clone();
-        CustomShape customShape = new CustomLine(currentShapeSelected,color,startPoint,endPoint);
+        CustomShape customShape = new CustomLine(currentShapeSelected,color,startPoint,endPoint,hasFilling);
         shapes.add(customShape);
         notifier.firePropertyChange("CreateShape",tempShapeList,shapes);
     }
@@ -56,8 +51,18 @@ public class Model implements IModel {
     @Override
     public void createRect(Point startPoint, Point endPoint) {
         LinkedList<CustomShape> tempShapeList = (LinkedList<CustomShape>)shapes.clone();
-        CustomShape customShape = new CustomRectangle(currentShapeSelected,color,startPoint,endPoint);
+        CustomShape customShape = new CustomRectangle(currentShapeSelected,color,startPoint,endPoint,hasFilling);
         ((CustomRectangle)customShape).findRectangleBoundaries();
+        shapes.add(customShape);
+        notifier.firePropertyChange("CreateShape",tempShapeList,shapes);
+    }
+
+    @Override
+    public void createSquare(Point startPoint, Point endPoint) {
+        LinkedList<CustomShape> tempShapeList = (LinkedList<CustomShape>)shapes.clone();
+        CustomShape customShape = new CustomSquare(currentShapeSelected,color,startPoint,endPoint,hasFilling);
+        ((CustomSquare)customShape).findRectangleBoundaries();
+        ((CustomSquare)customShape).setHeight(((CustomSquare) customShape).getWidth());
         shapes.add(customShape);
         notifier.firePropertyChange("CreateShape",tempShapeList,shapes);
     }
@@ -65,20 +70,31 @@ public class Model implements IModel {
     @Override
     public void createEllipse(Point startPoint, Point endPoint) {
         LinkedList<CustomShape> tempShapeList = (LinkedList<CustomShape>)shapes.clone();
-        CustomShape customShape = new CustomEllipse(currentShapeSelected,color,startPoint,endPoint);
+        CustomShape customShape = new CustomEllipse(currentShapeSelected,color,startPoint,endPoint,hasFilling);
         ((CustomEllipse)customShape).findRectangleBoundaries();
+        shapes.add(customShape);
+        notifier.firePropertyChange("CreateShape",tempShapeList,shapes);
+    }
+    @Override
+    public void createTriangle(Point initialPoint,Point[] points){
+        LinkedList<CustomShape> tempShapeList = (LinkedList<CustomShape>)shapes.clone();
+        CustomShape customShape = new CustomTriangle(currentShapeSelected,color,initialPoint,3,hasFilling);
+        ((CustomTriangle)customShape).setPoints(points);
         shapes.add(customShape);
         notifier.firePropertyChange("CreateShape",tempShapeList,shapes);
     }
 
     @Override
     public void setColor(Color color) {
-
+        this.color = color;
     }
 
     @Override
     public void enableFilling() {
-
+        boolean previousFillingState = hasFilling;
+        hasFilling = !hasFilling;
+        System.out.println(previousFillingState + " "+ hasFilling);
+        notifier.firePropertyChange("FillingValueChange",previousFillingState,hasFilling);
     }
 
     @Override
@@ -94,6 +110,12 @@ public class Model implements IModel {
 
     @Override
     public void redo() {
+        if(undoShapeStack.size()> 0){
+            CustomShape customShape = undoShapeStack.pop();
+            LinkedList<CustomShape> tempShapeList = (LinkedList<CustomShape>)shapes.clone();
+            shapes.addLast(customShape);
+            notifier.firePropertyChange("RedoMode",tempShapeList,shapes);
+        }
 
     }
     @Override

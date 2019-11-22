@@ -4,8 +4,13 @@ import Model.IModel;
 import Shapes.CustomRectangle;
 import Shapes.CustomShape;
 import com.sun.org.apache.regexp.internal.RE;
+import javafx.scene.effect.InnerShadow;
 
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
+import javax.swing.plaf.basic.BasicBorders;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
@@ -18,7 +23,9 @@ public class Delegate extends JFrame implements IDelegate{
     private String currentSelectedShape = null;
     private static final String LINE = "Line";
     private static final String RECTANGLE = "Rectangle";
+    private static final String SQUARE = "Square";
     private static final String ELLIPSE = "Ellipse";
+    private static final String TRIANGLE = "Triangle";
     private IModel model;
     private JPanel mainPanel;
     private JMenuBar menuBar;
@@ -85,9 +92,12 @@ public class Delegate extends JFrame implements IDelegate{
     public void createButtons() {
         Icon lineIcon = new ImageIcon("Icons\\LineIcon.png");
         Icon rectangleIcon = new ImageIcon("Icons\\rectangleIcon.png");
+        Icon squareIcon = new ImageIcon("Icons\\squareIcon.png");
+        Icon triangleIcon = new ImageIcon("Icons\\triangleIcon.png");
         Icon ellipseIcon = new ImageIcon("Icons\\ellipseIcon.png");
-        Icon paintBrush = new ImageIcon("Icons\\paintBrush.png");
+        Icon paintPalette = new ImageIcon("Icons\\paletteIcon.png");
         Icon paintBucket = new ImageIcon("Icons\\paintBucket.png");
+        Icon selectAndMoveIcon = new ImageIcon("Icons\\selectAndMoveIcon.png");
         Icon undoIcon = new ImageIcon("Icons\\undo.png");
         Icon redoIcon = new ImageIcon("Icons\\redo.png");
 
@@ -95,17 +105,33 @@ public class Delegate extends JFrame implements IDelegate{
 
         JButton lineButton = new JButton(lineIcon);
         JButton rectangleButton = new JButton(rectangleIcon);
+        JButton squareButton = new JButton(squareIcon);
+        JButton triangleButton = new JButton(triangleIcon);
         JButton ellipseButton = new JButton(ellipseIcon);
-        JButton brushButton = new JButton(paintBrush);
+        JButton paletteButton = new JButton(paintPalette);
         JButton bucketButton = new JButton(paintBucket);
+        JButton selectAndMoveButton = new JButton(selectAndMoveIcon);
         JButton undoButton = new JButton(undoIcon);
         JButton redoButton = new JButton(redoIcon);
 
+        lineButton.setToolTipText("Line");
+        rectangleButton.setToolTipText("Rectangle");
+        squareButton.setToolTipText("Square");
+        triangleButton.setToolTipText("Triangle");
+        ellipseButton.setToolTipText("Ellipse");
+        bucketButton.setToolTipText("Fill");
+        selectAndMoveButton.setToolTipText("Select and move Shapes");
+        undoButton.setToolTipText("Undo");
+        redoButton.setToolTipText("Redo");
+
         toolButtons.add(lineButton);
         toolButtons.add(rectangleButton);
+        toolButtons.add(squareButton);
+        toolButtons.add(triangleButton);
         toolButtons.add(ellipseButton);
-        toolButtons.add(brushButton);
+        toolButtons.add(paletteButton);
         toolButtons.add(bucketButton);
+        toolButtons.add(selectAndMoveButton);
         toolButtons.add(undoButton);
         toolButtons.add(redoButton);
     }
@@ -118,13 +144,11 @@ public class Delegate extends JFrame implements IDelegate{
     }
 
     public void addActionsToButtons(){
-        //Button(0) -> lineButton
-        //Button(1) -> RectangleButton
-        //Button(2) -> EllipseButton
-        //Button(3) -> Pencil
-        //Button(4) -> bucket
-        //Button(5) -> Undo
-        //Button(6) -> Redo
+        /*Button(0) -> lineButton                   Button(5) -> Palette
+         *Button(1) -> RectangleButton              Button(6) -> bucket
+         *Button(2) -> SquareButton                 Button(7) -> SelectAndMove
+         *Button(3) -> TriangleButton               Button(8) -> Undo
+         *Button(4) -> EllipseButton                Button(9) -> Redo*/
 
         toolButtons.get(0).addActionListener(new ActionListener() {
             @Override
@@ -139,30 +163,64 @@ public class Delegate extends JFrame implements IDelegate{
                 model.setCurrentShapeSelected(RECTANGLE);
             }
         });
-
         toolButtons.get(2).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                model.setCurrentShapeSelected(ELLIPSE);
+                model.setCurrentShapeSelected(SQUARE);
             }
         });
 
         toolButtons.get(3).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Color tempColor = JColorChooser.showDialog(Delegate.this,"Color Palette",color);
+                model.setCurrentShapeSelected(TRIANGLE);
+            }
+        });
+
+        toolButtons.get(4).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                model.setCurrentShapeSelected(ELLIPSE);
             }
         });
 
         toolButtons.get(5).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                Color tempColor = JColorChooser.showDialog(Delegate.this,"Color Palette",color);
+                model.setColor(tempColor);
+            }
+        });
+
+        toolButtons.get(6).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                model.enableFilling();
+            }
+        });
+
+        toolButtons.get(7).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        toolButtons.get(8).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
                 model.undo();
+            }
+        });
+        toolButtons.get(9).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                model.redo();
             }
         });
     }
 
-    public void redrawAfterUndo(LinkedList<CustomShape> shapes){
+    public void redrawAfterUndoRedo(LinkedList<CustomShape> shapes){
         drawingPanel.setShapes(shapes);
         drawingPanel.repaint();
     }
@@ -171,10 +229,33 @@ public class Delegate extends JFrame implements IDelegate{
     public void propertyChange(PropertyChangeEvent event) {
         if(event.getSource().equals(model)){
             if(event.getPropertyName().equalsIgnoreCase("ShapeSelectedChange")){
-                currentSelectedShape = (String)event.getNewValue();
-            }else if(event.getPropertyName().equalsIgnoreCase("UndoMode")){
-                redrawAfterUndo((LinkedList<CustomShape>) event.getNewValue());
-            }
+                SwingUtilities.invokeLater(new Runnable(){
+                    public void run(){
+                        currentSelectedShape = (String)event.getNewValue();
+                    }
+                });
+
+            } else if(event.getPropertyName().equalsIgnoreCase("UndoMode")){
+                SwingUtilities.invokeLater(new Runnable(){
+                    public void run(){
+                        redrawAfterUndoRedo((LinkedList<CustomShape>) event.getNewValue());
+                    }
+                });
+            } else if(event.getPropertyName().equalsIgnoreCase("RedoMode")){
+                SwingUtilities.invokeLater(new Runnable(){
+                    public void run(){
+                        redrawAfterUndoRedo((LinkedList<CustomShape>) event.getNewValue());
+                    }
+                });
+
+            }/* else if(event.getPropertyName().equalsIgnoreCase("FillingValueChange")){
+                SwingUtilities.invokeLater(new Runnable(){
+                    public void run(){
+                        bucketButtonFocus((boolean)event.getNewValue());
+                    }
+                });
+
+            }*/
         }
     }
 }

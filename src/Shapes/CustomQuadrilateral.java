@@ -1,19 +1,20 @@
 package Shapes;
 
+
 import java.awt.*;
 
-public class CustomEllipse extends CustomShape {
+public abstract class CustomQuadrilateral extends CustomShape {
 
+    private int width, height;
     private Point startPoint, endPoint,point1,point2;
-    private int height,width;
 
-    public CustomEllipse(String shapeId, Color shapeColor,Point point1,Point point2,boolean isFilled) {
-        super(shapeId, shapeColor,isFilled);
-
+    public CustomQuadrilateral( String shapeId, Color shapeColor,Point point1, Point point2, boolean isFilled) {
+        super(shapeId,shapeColor,isFilled);
         this.point1 = point1;
         this.point2 = point2;
         startPoint = new Point();
         endPoint = new Point();
+
     }
 
     public void findRectangleBoundaries(){
@@ -21,6 +22,7 @@ public class CustomEllipse extends CustomShape {
         calculateHeight();
         calculateWidth();
     }
+
     private void findStartEndPoints(){
         if(point1.x > point2.x) {
             startPoint.x = point2.x;
@@ -67,4 +69,7 @@ public class CustomEllipse extends CustomShape {
         return endPoint;
     }
 
+    public void setHeight(int height){
+        this.height = height;
+    }
 }
