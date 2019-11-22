@@ -2,6 +2,7 @@ package Shapes;
 
 
 import java.awt.*;
+import java.awt.geom.Area;
 
 public abstract class CustomQuadrilateral extends CustomShape {
 
@@ -19,8 +20,6 @@ public abstract class CustomQuadrilateral extends CustomShape {
 
     public void findRectangleBoundaries(){
         findStartEndPoints();
-        calculateHeight();
-        calculateWidth();
     }
 
     private void findStartEndPoints(){
@@ -40,8 +39,44 @@ public abstract class CustomQuadrilateral extends CustomShape {
         }
     }
 
+    public CustomShape getShapeInArea(Point point){
+
+        Area area = new Area(new Rectangle(this.getStartPoint().x,this.getStartPoint().y,this.getWidth(),this.getHeight()));
+        if(area.contains(point)){
+            return this;
+        }
+        return null;
+    }
+
+    @Override
+    public void moveShape(Point newPoint) {
+        int startPointX,  startPointY,  endPointX,  endPointY;
+        startPointX = newPoint.x;
+        startPointY = newPoint.y;
+
+        if(newPoint.x < this.getStartPoint().x){
+            endPointX = this.getStartPoint().x;
+        } else {
+            endPointX = this.getStartPoint().x + newPoint.x;
+        }
+        if(newPoint.y < this.getStartPoint().y){
+            endPointY = this.getStartPoint().y;
+        } else {
+            endPointY = this.getStartPoint().y +newPoint.y;
+        }
+        
+        this.setStartPoint(new Point(startPointX,startPointY));
+        this.setEndPoint(new Point(endPointX,endPointY));
+        this.findRectangleBoundaries();
+    }
+
     public void setEndPoint(Point point){
         point2 = point;
+        findRectangleBoundaries();
+    }
+
+    public void setStartPoint(Point point){
+        point1 = point;
         findRectangleBoundaries();
     }
 
@@ -53,6 +88,10 @@ public abstract class CustomQuadrilateral extends CustomShape {
         height = endPoint.y - startPoint.y;
     }
 
+    public void calculateShapeVariables(){
+        calculateHeight();
+        calculateWidth();
+    }
     public int getWidth(){
         return width;
     }

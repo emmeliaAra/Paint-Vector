@@ -4,8 +4,8 @@ import java.awt.*;
 
 public class CustomSquare extends CustomQuadrilateral {
 
-    public CustomSquare(String shapeId, Color shapeColor, Point point1, Point point2, boolean isFilled) {
-        super(shapeId, shapeColor, point1, point2, isFilled);
+    public CustomSquare(String shapeId, Color shapeColor, Point startPoint, Point endPoint, boolean isFilled) {
+        super(shapeId, shapeColor, startPoint, endPoint, isFilled);
 
     }
 

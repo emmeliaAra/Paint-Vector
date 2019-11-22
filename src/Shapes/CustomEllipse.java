@@ -67,4 +67,13 @@ public class CustomEllipse extends CustomShape {
         return endPoint;
     }
 
+    @Override
+    public void moveShape(Point newPoint) {
+
+    }
+
+    @Override
+    public CustomShape getShapeInArea(Point point) {
+        return null;
+    }
 }

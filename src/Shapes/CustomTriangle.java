@@ -1,7 +1,6 @@
 package Shapes;
 
 import java.awt.*;
-import java.util.LinkedList;
 
 public class CustomTriangle extends CustomShape {
 
@@ -24,5 +23,15 @@ public class CustomTriangle extends CustomShape {
 
     public Point[] getPoints(){
         return points;
+    }
+
+    @Override
+    public void moveShape(Point newPoint) {
+
+    }
+
+    @Override
+    public CustomShape getShapeInArea(Point point) {
+        return null;
     }
 }

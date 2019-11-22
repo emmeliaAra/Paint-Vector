@@ -1,6 +1,7 @@
 package Shapes;
 
 import java.awt.*;
+import java.awt.geom.Area;
 
 public abstract class CustomShape{
 
@@ -25,7 +26,8 @@ public abstract class CustomShape{
         return isFilled;
     }
 
-    public void setIsfiiled(boolean isfiiled){
-        this.isFilled = isfiiled;
-    }
+    public abstract void moveShape(Point newPoint);
+
+    public abstract CustomShape getShapeInArea(Point point);
+
 }

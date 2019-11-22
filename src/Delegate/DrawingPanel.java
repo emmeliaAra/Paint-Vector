@@ -9,9 +9,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.beans.PropertyChangeEvent;
-import java.beans.XMLDecoder;
 import java.util.LinkedList;
-import java.util.zip.ZipEntry;
 
 
 public class DrawingPanel extends JPanel implements MouseListener,MouseMotionListener,IDelegate {
@@ -31,6 +29,7 @@ public class DrawingPanel extends JPanel implements MouseListener,MouseMotionLis
     private CustomSquare square;
     private CustomEllipse ellipse;
     private CustomTriangle triangle;
+    private CustomShape currentSelectedShape;
 
 
 
@@ -103,8 +102,20 @@ public class DrawingPanel extends JPanel implements MouseListener,MouseMotionLis
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        System.out.println("hi agian");
-        ((CustomRectangle)storedShapes.get(0)).checkArea(e.getPoint());
+
+        //must loop over all the storedshapes, fu=inf the one select if there is one selectd and call move ewhen dragging.
+        if(model.getSelectMode()){
+            for (CustomShape shape: storedShapes) {
+                switch (shape.getShapeID()){
+                    case RECTANGLE:
+                    case SQUARE:
+                        currentSelectedShape=((CustomQuadrilateral)shape).getShapeInArea(e.getPoint());
+                            break;
+                }
+                if(currentSelectedShape != null)
+                    break;
+            }
+        }
     }
 
     @Override
@@ -130,27 +141,31 @@ public class DrawingPanel extends JPanel implements MouseListener,MouseMotionLis
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        switch(model.getCurrentShapeSelected()){
-            case LINE:
-                storedShapes.add(line);
-                model.createLine(line.getStartPoint(),line.getEndPoint());
-                break;
-            case RECTANGLE:
-               storedShapes.add(rectangle);
-               model.createRect(rectangle.getStartPoint(),rectangle.getEndPoint());
-               break;
-            case SQUARE:
-                storedShapes.add(square);
-                model.createSquare(square.getStartPoint(),square.getEndPoint());
-                break;
-            case ELLIPSE:
-               storedShapes.add(ellipse);
-               model.createEllipse(ellipse.getStartPoint(),ellipse.getEndPoint());
-               break;
-            case TRIANGLE:
-                storedShapes.add(triangle);
-                model.createTriangle(triangle.getInitialPoint(),triangle.getPoints());
-                break;
+        if(!model.getSelectMode()){
+            switch(model.getCurrentShapeSelected()){
+                case LINE:
+                    storedShapes.add(line);
+                    model.createLine(line.getStartPoint(),line.getEndPoint());
+                    break;
+                case RECTANGLE:
+                    storedShapes.add(rectangle);
+                    model.createRect(rectangle.getStartPoint(),rectangle.getEndPoint());
+                    break;
+                case SQUARE:
+                    storedShapes.add(square);
+                    model.createSquare(square.getStartPoint(),square.getEndPoint());
+                    break;
+                case ELLIPSE:
+                    storedShapes.add(ellipse);
+                    model.createEllipse(ellipse.getStartPoint(),ellipse.getEndPoint());
+                    break;
+                case TRIANGLE:
+                    storedShapes.add(triangle);
+                    model.createTriangle(triangle.getInitialPoint(),triangle.getPoints());
+                    break;
+            }
+        }else {
+            currentSelectedShape = null;
         }
     }
 
@@ -166,36 +181,50 @@ public class DrawingPanel extends JPanel implements MouseListener,MouseMotionLis
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        switch(model.getCurrentShapeSelected()){
-            case LINE:
-                line.setEndPoint(e.getPoint());
-                shapes.add(line);
-                break;
-            case RECTANGLE:
-                rectangle.setEndPoint(e.getPoint());
-                shapes.add(rectangle);
-                break;
-            case SQUARE:
-                square.setEndPoint(e.getPoint());
-                square.setHeight(square.getWidth());
-                shapes.add(square);
-                break;
-            case ELLIPSE:
-                ellipse.setEndPoint(e.getPoint());
-                shapes.add(ellipse);
-                break;
-            case TRIANGLE:
-                int initialX = triangle.getInitialPoint().x;
-                int initialY = triangle.getInitialPoint().y;
-                Point[] points = new Point[3];
-                points[0] = (new Point(initialX + (e.getPoint().x - initialX)/2, initialY));
-                points[1] = (new Point(initialX, initialY + (e.getPoint().y - initialY)));
-                points[2] = (new Point(e.getPoint().x,e.getPoint().y));
-                triangle.setPoints(points);
-                shapes.add(triangle);
-                break;
+        if(!model.getSelectMode()){
+            switch(model.getCurrentShapeSelected()){
+                case LINE:
+                    line.setEndPoint(e.getPoint());
+                    shapes.add(line);
+                    break;
+                case RECTANGLE:
+                    rectangle.setEndPoint(e.getPoint());
+                    rectangle.calculateShapeVariables();
+                    shapes.add(rectangle);
+                    break;
+                case SQUARE:
+                    square.setEndPoint(e.getPoint());
+                    square.calculateShapeVariables();
+                    square.setHeight(square.getWidth());
+                    shapes.add(square);
+                    break;
+                case ELLIPSE:
+                    ellipse.setEndPoint(e.getPoint());
+                    shapes.add(ellipse);
+                    break;
+                case TRIANGLE:
+                    int initialX = triangle.getInitialPoint().x;
+                    int initialY = triangle.getInitialPoint().y;
+                    Point[] points = new Point[3];
+                    points[0] = (new Point(initialX + (e.getPoint().x - initialX)/2, initialY));
+                    points[1] = (new Point(initialX, initialY + (e.getPoint().y - initialY)));
+                    points[2] = (new Point(e.getPoint().x,e.getPoint().y));
+                    triangle.setPoints(points);
+                    shapes.add(triangle);
+                    break;
+            }
+            repaint();
+        }else {
+            if(currentSelectedShape != null){
+                switch (currentSelectedShape.getShapeID()){
+                    case RECTANGLE:
+                    case SQUARE:
+                        ((CustomQuadrilateral) currentSelectedShape).moveShape(e.getPoint());
+                        break;
+                }
+                repaint();
+            }
         }
-        repaint();
     }
 
     @Override

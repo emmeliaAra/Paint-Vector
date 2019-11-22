@@ -17,14 +17,14 @@ public class Model implements IModel {
     private String currentShapeSelected = LINE;
     private LinkedList<CustomShape> shapes;
     private Color color;
-    private boolean hasFilling;
+    private boolean hasFilling, isSelectEnable;
     private Stack<CustomShape> undoShapeStack;
 
     public Model(){
         notifier = new PropertyChangeSupport(this);
         shapes = new LinkedList<>();
         color = Color.BLACK;
-        hasFilling = false;
+        hasFilling = isSelectEnable = false;
         undoShapeStack = new Stack<>();
     }
 
@@ -117,6 +117,16 @@ public class Model implements IModel {
             notifier.firePropertyChange("RedoMode",tempShapeList,shapes);
         }
 
+    }
+
+    @Override
+    public void setSelectMode(boolean isSelectEnable) {
+        this.isSelectEnable = isSelectEnable;
+    }
+
+    @Override
+    public boolean getSelectMode(){
+        return isSelectEnable;
     }
     @Override
     public String getCurrentShapeSelected(){

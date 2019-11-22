@@ -66,6 +66,7 @@ public class Delegate extends JFrame implements IDelegate{
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.add(mainPanel);
         this.setVisible(true);
+        this.setResizable(false);
     }
 
     public void createMenuBar() {
@@ -153,6 +154,7 @@ public class Delegate extends JFrame implements IDelegate{
         toolButtons.get(0).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                model.setSelectMode(false);
                 model.setCurrentShapeSelected(LINE);
             }
         });
@@ -160,12 +162,14 @@ public class Delegate extends JFrame implements IDelegate{
         toolButtons.get(1).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                model.setSelectMode(false);
                 model.setCurrentShapeSelected(RECTANGLE);
             }
         });
         toolButtons.get(2).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                model.setSelectMode(false);
                 model.setCurrentShapeSelected(SQUARE);
             }
         });
@@ -173,6 +177,7 @@ public class Delegate extends JFrame implements IDelegate{
         toolButtons.get(3).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                model.setSelectMode(false);
                 model.setCurrentShapeSelected(TRIANGLE);
             }
         });
@@ -180,6 +185,7 @@ public class Delegate extends JFrame implements IDelegate{
         toolButtons.get(4).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                model.setSelectMode(false);
                 model.setCurrentShapeSelected(ELLIPSE);
             }
         });
@@ -187,6 +193,7 @@ public class Delegate extends JFrame implements IDelegate{
         toolButtons.get(5).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                model.setSelectMode(false);
                 Color tempColor = JColorChooser.showDialog(Delegate.this,"Color Palette",color);
                 model.setColor(tempColor);
             }
@@ -195,6 +202,7 @@ public class Delegate extends JFrame implements IDelegate{
         toolButtons.get(6).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                model.setSelectMode(false);
                 model.enableFilling();
             }
         });
@@ -202,19 +210,21 @@ public class Delegate extends JFrame implements IDelegate{
         toolButtons.get(7).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                model.setSelectMode(true);
             }
         });
 
         toolButtons.get(8).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                model.setSelectMode(false);
                 model.undo();
             }
         });
         toolButtons.get(9).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                model.setSelectMode(false);
                 model.redo();
             }
         });

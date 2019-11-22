@@ -23,4 +23,14 @@ public class CustomLine extends CustomShape {
     public void setEndPoint(Point point){
         endPoint = point;
     }
+
+    @Override
+    public void moveShape(Point newPoint) {
+
+    }
+
+    @Override
+    public CustomShape getShapeInArea(Point point) {
+        return null;
+    }
 }

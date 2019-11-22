@@ -19,6 +19,8 @@ public interface IModel {
     void enableFilling();
     void undo();
     void redo();
+    void setSelectMode(boolean isSelected);
     String getCurrentShapeSelected();
+    boolean getSelectMode();
     Color getColor();
 }
