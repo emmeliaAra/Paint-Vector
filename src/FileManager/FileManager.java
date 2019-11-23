@@ -21,18 +21,21 @@ public class FileManager {
 
         ObjectOutputStream objectOutputStream = null;
         FileOutputStream fileOutputStream = null;
-        try {
-            fileOutputStream = new FileOutputStream(fileName,true);
-            objectOutputStream = new ObjectOutputStream(fileOutputStream);
-            objectOutputStream.writeObject(model);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }finally {
-            if(objectOutputStream != null)
-                objectOutputStream.close();
-            if (fileOutputStream != null)
-                fileOutputStream.close();
-        }
+        if(fileName != null && model != null){
+            try {
+                fileOutputStream = new FileOutputStream(fileName,true);
+                objectOutputStream = new ObjectOutputStream(fileOutputStream);
+                objectOutputStream.writeObject(model);
+            } catch (IOException e) {
+                throw new FileNotFoundException("Please give a valid File name. File Not Saved");
+            }finally {
+                if(objectOutputStream != null)
+                    objectOutputStream.close();
+                if (fileOutputStream != null)
+                    fileOutputStream.close();
+            }
+        }else
+            throw new NullPointerException("Please give a name to the file");
     }
 
     /**
@@ -52,20 +55,23 @@ public class FileManager {
         int returnValue = fileChooser.showOpenDialog(frame);
         if(returnValue == JFileChooser.APPROVE_OPTION)
             fileName  = fileChooser.getSelectedFile().getPath();
-        try {
-            fileInputStream = new FileInputStream(fileName);
-            objectInputStream = new ObjectInputStream(fileInputStream);
-            IModel model = (IModel)objectInputStream.readObject();
-            return model;
-        } catch (FileNotFoundException e) {
-            System.out.println("File not Found or File not selected. Try Again");
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        } finally {
-            if(objectInputStream != null)
-                objectInputStream.close();
-            if(fileInputStream != null)
-                fileInputStream.close();
+
+        if(fileName != null){
+            try {
+                fileInputStream = new FileInputStream(fileName);
+                objectInputStream = new ObjectInputStream(fileInputStream);
+                IModel model = (IModel)objectInputStream.readObject();
+                return model;
+            } catch (FileNotFoundException e) {
+                System.out.println("File not Found or File not selected. Try Again");
+            } catch (IOException | ClassNotFoundException e) {
+               System.out.println("Please load an appropriate ");
+            } finally {
+                if(objectInputStream != null)
+                    objectInputStream.close();
+                if(fileInputStream != null)
+                    fileInputStream.close();
+            }
         }
         return null;
     }

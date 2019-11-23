@@ -60,7 +60,7 @@ public abstract class CustomQuadrilateral extends CustomShape implements Seriali
      */
     public CustomShape getShapeInArea(Point point){
 
-        Area area = new Area(new Rectangle(this.getStartPoint().x,this.getStartPoint().y,this.getWidth(),this.getHeight()));
+        Area area = new Area(new Rectangle(getStartPoint().x,getStartPoint().y,getWidth(),getHeight()));
         if(area.contains(point)){
             return this;
         }

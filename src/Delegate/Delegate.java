@@ -330,7 +330,9 @@ public class Delegate extends JFrame implements IDelegate{
                 SwingUtilities.invokeLater(new Runnable(){
                     public void run(){
                         try {
-                            FileManager.saveCanvas((IModel)event.getNewValue(),createSavePopUpWindow());
+                            String fileName = createSavePopUpWindow();
+                            if(fileName != null && !fileName.isEmpty())
+                                FileManager.saveCanvas((IModel)event.getNewValue(),createSavePopUpWindow());
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
