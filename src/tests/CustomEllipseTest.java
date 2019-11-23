@@ -9,17 +9,26 @@ import java.awt.*;
 
 import static org.junit.Assert.*;
 
+/**
+ * This class is used to test the functionality of the Ellipse class
+ */
 public class CustomEllipseTest {
 
     private CustomEllipse ellipse;
 
 
+    /**
+     * Sets up the environment fo testing
+     */
     @Before
     public void setup() {
         ellipse = new CustomEllipse("Ellipse", Color.black,new Point(1,1),new Point(3,3),false);
         ellipse.findBoundaries();
     }
 
+    /**
+     * Test find boundaries.
+     */
     @Test
     public void testFindBoundaries(){
         assertEquals(ellipse.getStartPoint().x,1);
@@ -30,12 +39,18 @@ public class CustomEllipseTest {
         assertEquals(ellipse.getHeight(),2);
     }
 
+    /**
+     * Test get shape area.
+     */
     @Test
     public void testGetShapeArea(){
         CustomShape expectedEllipse = ellipse.getShapeInArea(new Point(2,2));
         assertEquals(expectedEllipse,ellipse);
     }
 
+    /**
+     * Test move shape.
+     */
     @Test
     public void testMoveShape(){
         ellipse.moveShape(new Point(7,8));

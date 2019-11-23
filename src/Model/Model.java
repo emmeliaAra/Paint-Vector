@@ -52,7 +52,6 @@ public class Model implements IModel, Serializable {
         notifier.firePropertyChange("ShapeSelectedChange",previousShapeSelected,currentShapeSelected);
     }
 
-
     /**
      * This method is called whenever a new line must be created.
      * @param startPoint the start point
