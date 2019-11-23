@@ -22,11 +22,13 @@ public interface IModel {
     void undo();
     void redo();
     void setSelectMode(boolean isSelected);
+    void clearPage();
     String getCurrentShapeSelected();
     boolean getSelectMode();
     void saveCanvas();
     void loadCanvas();
     boolean getHasFilling();
     Color getColor();
+
     LinkedList<CustomShape> getStoredShapes();
 }

@@ -1,18 +1,19 @@
 package FileManager;
 
 import Model.IModel;
-import Shapes.CustomShape;
 
+import javax.swing.*;
 import java.io.*;
+import java.nio.file.Path;
 
 
 public class FileManager {
 
-    public static void saveCanvas(IModel model) throws IOException {
+    public static void saveCanvas(IModel model,String fileName) throws IOException {
         ObjectOutputStream objectOutputStream = null;
         FileOutputStream fileOutputStream = null;
         try {
-            fileOutputStream = new FileOutputStream("test",true);
+            fileOutputStream = new FileOutputStream(fileName,true);
             objectOutputStream = new ObjectOutputStream(fileOutputStream);
             objectOutputStream.writeObject(model);
         } catch (IOException e) {
@@ -25,11 +26,18 @@ public class FileManager {
         }
     }
 
-    public static IModel loadCanvas(IModel newValue) throws IOException {
+    public static IModel loadCanvas(IModel newValue,JFrame frame) throws IOException {
+        String fileName = null;
+        JFileChooser fileChooser = new JFileChooser();
+        int returnValue = fileChooser.showOpenDialog(frame);
+
+        if(returnValue == JFileChooser.APPROVE_OPTION)
+            fileName  = fileChooser.getSelectedFile().getPath();
+
         ObjectInputStream objectInputStream = null;
         FileInputStream fileInputStream = null;
         try {
-            fileInputStream = new FileInputStream("test");
+            fileInputStream = new FileInputStream(fileName);
             objectInputStream = new ObjectInputStream(fileInputStream);
             IModel model = (IModel)objectInputStream.readObject();
             return model;

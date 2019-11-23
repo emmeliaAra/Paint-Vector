@@ -1,7 +1,6 @@
 package Delegate;
 
 import Model.IModel;
-import Model.Model;
 import Shapes.CustomShape;
 import FileManager.FileManager;
 import javax.swing.*;
@@ -60,6 +59,13 @@ public class Delegate extends JFrame implements IDelegate{
     }
 
     public void createButtons() {
+
+        Icon loadIcon = new ImageIcon("Icons\\loadIcon.png");
+        Icon saveIcon = new ImageIcon("Icons\\saveIcon.png");
+        Icon undoIcon = new ImageIcon("Icons\\undo.png");
+        Icon redoIcon = new ImageIcon("Icons\\redo.png");
+        Icon selectAndMoveIcon = new ImageIcon("Icons\\selectAndMoveIcon.png");
+        Icon clearIcon = new ImageIcon("Icons\\clearIcon.png");
         Icon lineIcon = new ImageIcon("Icons\\LineIcon.png");
         Icon rectangleIcon = new ImageIcon("Icons\\rectangleIcon.png");
         Icon squareIcon = new ImageIcon("Icons\\squareIcon.png");
@@ -67,14 +73,15 @@ public class Delegate extends JFrame implements IDelegate{
         Icon ellipseIcon = new ImageIcon("Icons\\ellipseIcon.png");
         Icon paintPalette = new ImageIcon("Icons\\paletteIcon.png");
         Icon paintBucket = new ImageIcon("Icons\\paintBucket.png");
-        Icon selectAndMoveIcon = new ImageIcon("Icons\\selectAndMoveIcon.png");
-        Icon undoIcon = new ImageIcon("Icons\\undo.png");
-        Icon redoIcon = new ImageIcon("Icons\\redo.png");
-        Icon saveIcon = new ImageIcon("Icons\\saveIcon.png");
-        Icon loadIcon = new ImageIcon("Icons\\loadIcon.png");
 
         toolButtons = new LinkedList<>();
 
+        JButton loadButton = new JButton(loadIcon);
+        JButton saveButton = new JButton(saveIcon);
+        JButton undoButton = new JButton(undoIcon);
+        JButton redoButton = new JButton(redoIcon);
+        JButton selectAndMoveButton = new JButton(selectAndMoveIcon);
+        JButton clearButton = new JButton(clearIcon);
         JButton lineButton = new JButton(lineIcon);
         JButton rectangleButton = new JButton(rectangleIcon);
         JButton squareButton = new JButton(squareIcon);
@@ -82,24 +89,27 @@ public class Delegate extends JFrame implements IDelegate{
         JButton ellipseButton = new JButton(ellipseIcon);
         JButton paletteButton = new JButton(paintPalette);
         JButton bucketButton = new JButton(paintBucket);
-        JButton selectAndMoveButton = new JButton(selectAndMoveIcon);
-        JButton undoButton = new JButton(undoIcon);
-        JButton redoButton = new JButton(redoIcon);
-        JButton saveButton = new JButton(saveIcon);
-        JButton loadButton = new JButton(loadIcon);
 
+        loadButton.setToolTipText("Load Canvas");
+        saveButton.setToolTipText("Save Canvas");
+        undoButton.setToolTipText("Undo");
+        redoButton.setToolTipText("Redo");
+        selectAndMoveButton.setToolTipText("Select and move Shapes");
+        clearButton.setToolTipText("Clear Canvas");
         lineButton.setToolTipText("Line");
         rectangleButton.setToolTipText("Rectangle");
         squareButton.setToolTipText("Square");
         triangleButton.setToolTipText("Triangle");
         ellipseButton.setToolTipText("Ellipse");
+        paletteButton.setToolTipText("Color Palette");
         bucketButton.setToolTipText("Fill");
-        selectAndMoveButton.setToolTipText("Select and move Shapes");
-        undoButton.setToolTipText("Undo");
-        redoButton.setToolTipText("Redo");
-        saveButton.setToolTipText("Save Canvas");
-        saveButton.setToolTipText("Load Canvas");
 
+        toolButtons.add(loadButton);
+        toolButtons.add(saveButton);
+        toolButtons.add(undoButton);
+        toolButtons.add(redoButton);
+        toolButtons.add(selectAndMoveButton);
+        toolButtons.add(clearButton);
         toolButtons.add(lineButton);
         toolButtons.add(rectangleButton);
         toolButtons.add(squareButton);
@@ -107,11 +117,6 @@ public class Delegate extends JFrame implements IDelegate{
         toolButtons.add(ellipseButton);
         toolButtons.add(paletteButton);
         toolButtons.add(bucketButton);
-        toolButtons.add(selectAndMoveButton);
-        toolButtons.add(undoButton);
-        toolButtons.add(redoButton);
-        toolButtons.add(saveButton);
-        toolButtons.add(loadButton);
     }
 
     public JToolBar addButtons(JToolBar toolBar){
@@ -122,11 +127,13 @@ public class Delegate extends JFrame implements IDelegate{
     }
 
     public void addActionsToButtons(){
-        /*Button(0) -> lineButton                   Button(5) -> Palette
-         *Button(1) -> RectangleButton              Button(6) -> bucket
-         *Button(2) -> SquareButton                 Button(7) -> SelectAndMove
-         *Button(3) -> TriangleButton               Button(8) -> Undo
-         *Button(4) -> EllipseButton                Button(9) -> Redo*/
+        /*Button(0) -> lineButton                   Button(7) -> SelectAndMove
+         *Button(1) -> RectangleButton              Button(8) -> Undo
+         *Button(2) -> SquareButton                 Button(9) -> Redo
+         *Button(3) -> TriangleButton               Button(10) -> Save
+         *Button(4) -> EllipseButton                Button(11) -> load
+         *Button(5) -> Palette                      Button(12) -> Clear
+         *Button(6) -> bucket*/
 
         toolButtons.get(0).addActionListener(new ActionListener() {
             @Override
@@ -221,6 +228,19 @@ public class Delegate extends JFrame implements IDelegate{
                 model.loadCanvas();
             }
         });
+
+        toolButtons.get(12).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                model.clearPage();
+            }
+        });
+    }
+
+    public String createSavePopUpWindow(){
+        String fileName = (String)JOptionPane.showInputDialog(
+                this,"Give a name for the file","File name dialog",JOptionPane.PLAIN_MESSAGE,null,null,null);
+        return fileName;
     }
 
     public void redrawAfterUndoRedo(LinkedList<CustomShape> shapes){
@@ -254,17 +274,18 @@ public class Delegate extends JFrame implements IDelegate{
                 SwingUtilities.invokeLater(new Runnable(){
                     public void run(){
                         try {
-                            FileManager.saveCanvas((IModel)event.getNewValue());
+                            FileManager.saveCanvas((IModel)event.getNewValue(),createSavePopUpWindow());
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
                 });
             }else if(event.getPropertyName().equalsIgnoreCase("LoadCanvas")){
+                JFrame jFrame = this;
                 SwingUtilities.invokeLater(new Runnable(){
                     public void run(){
-                        try {
-                            model = FileManager.loadCanvas((IModel)event.getNewValue());
+                        try{
+                            model = FileManager.loadCanvas((IModel)event.getNewValue(),jFrame);
                             drawingPanel.setModel(model);
                             drawingPanel.setShapes(model.getStoredShapes());
                             drawingPanel.repaint();

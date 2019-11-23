@@ -13,7 +13,7 @@ import java.io.Serializable;
 import java.util.LinkedList;
 
 
-public class DrawingPanel extends JPanel implements MouseListener,MouseMotionListener, Serializable {
+public class DrawingPanel extends JPanel implements MouseListener,MouseMotionListener, Serializable,IDelegate {
 
     private IModel model;
     private LinkedList<CustomShape> shapes,storedShapes;
@@ -37,6 +37,7 @@ public class DrawingPanel extends JPanel implements MouseListener,MouseMotionLis
         this.setBorder(BorderFactory.createLineBorder(Color.GRAY,5));
         this.setBackground(Color.WHITE);
         this.model = model;
+        this.model.addObservers(this);
         shapes = new LinkedList<>();
         storedShapes = new LinkedList<>();
     }
@@ -251,4 +252,18 @@ public class DrawingPanel extends JPanel implements MouseListener,MouseMotionLis
         this.model = model;
     }
 
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+        if(event.getSource().equals(model)){
+            if(event.getPropertyName().equalsIgnoreCase("ClearPage")){
+                SwingUtilities.invokeLater(new Runnable(){
+                    public void run(){
+                        shapes = new LinkedList<>();
+                        storedShapes = new LinkedList<>();
+                        repaint();
+                    }
+                });
+            }
+        }
+    }
 }

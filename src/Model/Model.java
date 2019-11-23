@@ -124,6 +124,15 @@ public class Model implements IModel, Serializable {
     }
 
     @Override
+    public void clearPage() {
+        undoShapeStack = new Stack<>();
+        LinkedList<CustomShape> tempShapeList = (LinkedList<CustomShape>)shapes.clone();
+        shapes = new LinkedList<>();
+        notifier.firePropertyChange("ClearPage",tempShapeList,shapes);
+
+    }
+
+    @Override
     public boolean getSelectMode(){
         return isSelectEnable;
     }
