@@ -139,7 +139,7 @@ public class Delegate extends JFrame implements IDelegate{
             @Override
             public void actionPerformed(ActionEvent e) {
                 model.setSelectMode(false);
-                model.setCurrentShapeSelected(LINE);
+                model.loadCanvas();
             }
         });
 
@@ -147,14 +147,15 @@ public class Delegate extends JFrame implements IDelegate{
             @Override
             public void actionPerformed(ActionEvent e) {
                 model.setSelectMode(false);
-                model.setCurrentShapeSelected(RECTANGLE);
+                model.saveCanvas();
             }
         });
+
         toolButtons.get(2).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 model.setSelectMode(false);
-                model.setCurrentShapeSelected(SQUARE);
+                model.undo();
             }
         });
 
@@ -162,11 +163,56 @@ public class Delegate extends JFrame implements IDelegate{
             @Override
             public void actionPerformed(ActionEvent e) {
                 model.setSelectMode(false);
-                model.setCurrentShapeSelected(TRIANGLE);
+                model.redo();
             }
         });
 
         toolButtons.get(4).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                model.setSelectMode(true);
+            }
+        });
+
+        toolButtons.get(5).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                model.clearPage();
+            }
+        });
+
+        toolButtons.get(6).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                model.setSelectMode(false);
+                model.setCurrentShapeSelected(LINE);
+            }
+        });
+
+        toolButtons.get(7).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                model.setSelectMode(false);
+                model.setCurrentShapeSelected(RECTANGLE);
+            }
+        });
+        toolButtons.get(8).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                model.setSelectMode(false);
+                model.setCurrentShapeSelected(SQUARE);
+            }
+        });
+
+        toolButtons.get(9).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                model.setSelectMode(false);
+                model.setCurrentShapeSelected(TRIANGLE);
+            }
+        });
+
+        toolButtons.get(10).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 model.setSelectMode(false);
@@ -174,7 +220,7 @@ public class Delegate extends JFrame implements IDelegate{
             }
         });
 
-        toolButtons.get(5).addActionListener(new ActionListener() {
+        toolButtons.get(11).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 model.setSelectMode(false);
@@ -183,56 +229,11 @@ public class Delegate extends JFrame implements IDelegate{
             }
         });
 
-        toolButtons.get(6).addActionListener(new ActionListener() {
+        toolButtons.get(12).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 model.setSelectMode(false);
                 model.enableFilling();
-            }
-        });
-
-        toolButtons.get(7).addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                model.setSelectMode(true);
-            }
-        });
-
-        toolButtons.get(8).addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                model.setSelectMode(false);
-                model.undo();
-            }
-        });
-        toolButtons.get(9).addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                model.setSelectMode(false);
-                model.redo();
-            }
-        });
-
-        toolButtons.get(10).addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                model.setSelectMode(false);
-                model.saveCanvas();
-            }
-        });
-
-        toolButtons.get(11).addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                model.setSelectMode(false);
-                model.loadCanvas();
-            }
-        });
-
-        toolButtons.get(12).addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                model.clearPage();
             }
         });
     }
@@ -285,10 +286,13 @@ public class Delegate extends JFrame implements IDelegate{
                 SwingUtilities.invokeLater(new Runnable(){
                     public void run(){
                         try{
-                            model = FileManager.loadCanvas((IModel)event.getNewValue(),jFrame);
-                            drawingPanel.setModel(model);
-                            drawingPanel.setShapes(model.getStoredShapes());
-                            drawingPanel.repaint();
+                            IModel tempModel = FileManager.loadCanvas((IModel)event.getNewValue(),jFrame);
+                            if(tempModel != null) {
+                                model = tempModel;
+                                drawingPanel.setModel(model);
+                                drawingPanel.setShapes(model.getStoredShapes());
+                                drawingPanel.repaint();
+                            }
                         } catch (IOException e) {
                             e.printStackTrace();
                         }

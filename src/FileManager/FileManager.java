@@ -42,7 +42,7 @@ public class FileManager {
             IModel model = (IModel)objectInputStream.readObject();
             return model;
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            System.out.println("File not Found or File not selected. Try Again");
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
